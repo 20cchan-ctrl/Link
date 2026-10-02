@@ -1,1 +1,232 @@
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Return My Kid Band</title>
+  <!-- Supabase library -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 600px;
+      margin: auto;
+      padding: 25px;
+      background: #f4f7fb;
+    }
+    h1 {
+      text-align: center;
+    }
+    .card {
+      background: white;
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    label {
+      display: block;
+      margin-top: 12px;
+      font-weight: bold;
+    }
+    input,
+    textarea,
+    button {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 12px;
+      margin-top: 6px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+    button {
+      margin-top: 18px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    #editor,
+    #information {
+      display: none;
+    }
+    #status {
+      margin-top: 15px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Return My Kid Band</h1>
+    <p id="message">
+      This band helps return a lost child to their parent or guardian.
+    </p>
+    <!-- Information shown after the band is claimed -->
+    <div id="information">
+      <h2>Child Information</h2>
+      <p>
+        <strong>Name:</strong>
+        <span id="childName"></span>
+      </p>
+      <p>
+        <strong>Age:</strong>
+        <span id="childAge"></span>
+      </p>
+      <p>
+        <strong>Medical information:</strong>
+        <span id="medicalInfo"></span>
+      </p>
+      <p>
+        <strong>Parent/Guardian:</strong>
+        <span id="guardianName"></span>
+      </p>
+      <p>
+        <strong>Phone:</strong>
+        <span id="guardianPhone"></span>
+      </p>
+    </div>
+    <!-- First setup -->
+    <div id="editor">
+      <h2>Set Up This Band</h2>
+      <label>Child's name</label>
+      <input id="nameInput" type="text">
+      <label>Child's age</label>
+      <input id="ageInput" type="number">
+      <label>Medical information</label>
+      <textarea id="medicalInput"></textarea>
+      <label>Parent/Guardian name</label>
+      <input id="guardianInput" type="text">
+      <label>Parent/Guardian phone</label>
+      <input id="phoneInput" type="tel">
+      <button onclick="saveInformation()">
+        Save Information
+      </button>
+    </div>
+    <p id="status"></p>
+  </div>
+  <!-- ==========================================
+       JAVASCRIPT
+       ========================================== -->
+  <script>
+    // ==========================================
+    // SUPABASE CONNECTION
+    // ==========================================
+    const SUPABASE_URL =
+      "https://fwrqozydpbjurtxwwzke.supabase.co/rest/v1/";
+    const SUPABASE_KEY =
+      "sb_publishable_jr92XP2mEkS6-4jewtXP5w_-eccZE11";
+    const supabaseClient =
+      supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY
+      );
+    // ==========================================
+    // BAND ID
+    // ==========================================
+    const BAND_ID = "band-001";
+    // ==========================================
+    // LOAD BAND INFORMATION
+    // ==========================================
+    async function loadBand() {
+      const { data, error } =
+        await supabaseClient
+          .from("bands")
+          .select("*")
+          .eq("band_id", BAND_ID)
+          .single();
+      if (error) {
+        console.log(error);
+        document.getElementById("status").textContent =
+          "Could not load band information.";
+        return;
+      }
+      // ==========================================
+      // FIRST PERSON
+      // ==========================================
+      if (!data.claimed) {
+        document.getElementById("editor").style.display =
+          "block";
+        document.getElementById("information").style.display =
+          "none";
+        document.getElementById("message").textContent =
+          "This band has not been set up yet. The first person can set it up.";
+        return;
+      }
+      // ==========================================
+      // EVERYONE AFTER FIRST PERSON
+      // VIEW ONLY
+      // ==========================================
+      document.getElementById("editor").style.display =
+        "none";
+      document.getElementById("information").style.display =
+        "block";
+      document.getElementById("childName").textContent =
+        data.child_name || "";
+      document.getElementById("childAge").textContent =
+        data.child_age || "";
+      document.getElementById("medicalInfo").textContent =
+        data.medical_info || "";
+      document.getElementById("guardianName").textContent =
+        data.guardian_name || "";
+      document.getElementById("guardianPhone").textContent =
+        data.guardian_phone || "";
+    }
+    // ==========================================
+    // SAVE INFORMATION
+    // ==========================================
+    async function saveInformation() {
+      const childName =
+        document.getElementById("nameInput").value;
+      const childAge =
+        document.getElementById("ageInput").value;
+      const medicalInfo =
+        document.getElementById("medicalInput").value;
+      const guardianName =
+        document.getElementById("guardianInput").value;
+      const guardianPhone =
+        document.getElementById("phoneInput").value;
+      const { data, error } =
+        await supabaseClient
+          .from("bands")
+          .update({
+            child_name: childName,
+            child_age: childAge,
+            medical_info: medicalInfo,
+            guardian_name: guardianName,
+            guardian_phone: guardianPhone,
+            claimed: true
+          })
+          .eq("band_id", BAND_ID)
+          .eq("claimed", false)
+          .select();
+      // ==========================================
+      // ERROR
+      // ==========================================
+      if (error) {
+        console.log(error);
+        document.getElementById("status").textContent =
+          "There was a problem saving the information.";
+        return;
+      }
+      // ==========================================
+      // ALREADY CLAIMED
+      // ==========================================
+      if (!data || data.length === 0) {
+        document.getElementById("status").textContent =
+          "This band has already been claimed.";
+        await loadBand();
+        return;
+      }
+      // ==========================================
+      // SUCCESS
+      // ==========================================
+      document.getElementById("status").textContent =
+        "Information saved!";
+      await loadBand();
+    }
+    // ==========================================
+    // START WEBSITE
+    // ==========================================
+    loadBand();
+  </script>
+</body>
+</html>
