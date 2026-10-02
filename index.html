@@ -136,7 +136,7 @@
       if (error) {
         console.log(error);
         document.getElementById("status").textContent =
-          "Could not load band information.";
+  "Supabase error: " + error.message;
         return;
       }
       // ==========================================
