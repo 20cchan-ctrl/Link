@@ -186,12 +186,12 @@
         document.getElementById("phoneInput").value;
       const { data, error } =
         await supabaseClient
-         .update({
+        .update({
   child_name: childName,
   child_age: childAge,
   medical_info: medicalInfo,
-  parent_names: guardianName,
-  parent_phone_numbers: guardianPhone,
+  guardian_name: guardianName,
+  guardian_phone: guardianPhone,
   claimed: true
 })
 .eq("band_id", BAND_ID)
