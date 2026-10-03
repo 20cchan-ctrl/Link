@@ -155,7 +155,8 @@
   // =========================================================
   // THIS WEBSITE IS SPECIFICALLY FOR BAND-001
   // =========================================================
-  const BAND_ID = "band-001";
+  const urlParams = new URLSearchParams(window.location.search);
+  const BAND_ID = urlParams.get("band") || "band-001";
   // =========================================================
   // PAGE ELEMENTS
   // =========================================================
