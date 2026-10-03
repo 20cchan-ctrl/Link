@@ -82,19 +82,20 @@
 </head>
 <body>
 <div class="container">
-  <h1>Return My Kid Band</h1>
-  <p class="subtitle">
-    This band helps return a lost child to their parent or guardian.
-  </p>
+  <h1>Link</h1>
+<p class="subtitle">
+  This band helps reunite people who become separated from their
+  family, guardian, or caregiver.
+</p>
   <div id="status" class="status">
     Loading band information...
   </div>
   <!-- FIRST-SCAN / EDITOR FORM -->
   <div id="editSection" class="hidden">
-    <h2>Set Up This Band</h2>
+   <h2>Set Up This Link</h2>
     <p>
-      This is the first setup for this band. Enter the child's information
-      and the parent or guardian's contact information.
+      This is the first setup for this band. Enter the peoples information
+      and the parent, guardian's or caregivers contact information.
     </p>
    <label>Name</label>
 <input id="childName" type="text" placeholder="Name">
@@ -102,9 +103,13 @@
 <label>Age</label>
 <input id="childAge" type="number" placeholder="Age">
 
-<label>Medical Information</label>
+<<label>Medical Information</label>
 <textarea id="medicalInfo"
   placeholder="Important medical information"></textarea>
+
+<label>Parent/Guardian/Caretaker Name</label>
+<input id="guardianName" type="text"
+  placeholder="Name">
 
 <label>Parent/Guardian/Caretaker Phone Number</label>
 <input id="guardianPhone" type="tel"
@@ -143,6 +148,7 @@
     </button>
   </div>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
   // =========================================================
   // SUPABASE SETTINGS
