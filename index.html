@@ -132,7 +132,7 @@
           .from("bands")
           .select("*")
           .eq("band_id", BAND_ID)
-          .single();
+          .maybeSingle();
       if (error) {
         console.log(error);
         document.getElementById("status").textContent =
